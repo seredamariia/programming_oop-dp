@@ -157,90 +157,9 @@ public class Employee : IDisposable
 
 public class Developer : Employee
 {
-    private string name;
-    private int age;
-    private string phoneNumber;
-    private double salary;
-
     public Developer(string name, int age, string phoneNumber, double salary) : base(name, age, phoneNumber, salary)
     {
         Console.WriteLine("Developer parametric constructor worked successfully");
-    }
-
-    public string Name
-    {
-        get { return name; }
-        set
-        {
-            if (Program.access_level == "user")
-                Console.WriteLine("You do not have rights to set Name");
-            else if (value == null)
-                Console.WriteLine("Name cannot be empty");
-            else
-                name = value;
-        }
-    }
-
-    public int Age
-    {
-        get
-        {
-            if (Program.access_level == "user")
-            {
-                Console.WriteLine("You do not have rights to get Age");
-                return 0;
-            }
-            else
-                return age;
-        }
-        set
-        {
-            if (Program.access_level == "user")
-                Console.WriteLine("You do not have rights to set Age");
-            else if (value < 16 || value > 99)
-                Console.WriteLine("Age must be in between 16 and 99");
-            else
-                age = value;
-        }
-    }
-
-    public string PhoneNumber
-    {
-        get { return phoneNumber; }
-        set
-        {
-            if (Program.access_level == "user")
-                Console.WriteLine("You do not have rights to set Phone Number");
-            else if (value == null)
-                Console.WriteLine("Phone Number cannot be empty");
-            else if (!value.Contains("+380"))
-                Console.WriteLine("Phone Number must start with +380");
-            else
-                phoneNumber = value;
-        }
-    }
-
-    public double Salary
-    {
-        get
-        {
-            if (Program.access_level == "user")
-            {
-                Console.WriteLine("You do not have rights to get Salary");
-                return 0;
-            }
-            else
-                return salary;
-        }
-        set
-        {
-            if (Program.access_level == "user")
-                Console.WriteLine("You do not have rights to set Salary");
-            else if (value < 6700.00)
-                Console.WriteLine("Salary cannot be less than 6700 UAH");
-            else
-                salary = value;
-        }
     }
 
     public override void DisplayMainSkill()
@@ -256,90 +175,9 @@ public class Developer : Employee
 
 public class Designer : Employee
 {
-    private string name;
-    private int age;
-    private string phoneNumber;
-    private double salary;
-
     public Designer(string name, int age, string phoneNumber, double salary) : base(name, age, phoneNumber, salary)
     {
         Console.WriteLine("Designer parametric constructor worked successfully");
-    }
-
-    public string Name
-    {
-        get { return name; }
-        set
-        {
-            if (Program.access_level == "user")
-                Console.WriteLine("You do not have rights to set Name");
-            else if (value == null)
-                Console.WriteLine("Name cannot be empty");
-            else
-                name = value;
-        }
-    }
-
-    public int Age
-    {
-        get
-        {
-            if (Program.access_level == "user")
-            {
-                Console.WriteLine("You do not have rights to get Age");
-                return 0;
-            }
-            else
-                return age;
-        }
-        set
-        {
-            if (Program.access_level == "user")
-                Console.WriteLine("You do not have rights to set Age");
-            else if (value < 16 || value > 99)
-                Console.WriteLine("Age must be in between 16 and 99");
-            else
-                age = value;
-        }
-    }
-
-    public string PhoneNumber
-    {
-        get { return phoneNumber; }
-        set
-        {
-            if (Program.access_level == "user")
-                Console.WriteLine("You do not have rights to set Phone Number");
-            else if (value == null)
-                Console.WriteLine("Phone Number cannot be empty");
-            else if (!value.Contains("+380"))
-                Console.WriteLine("Phone Number must start with +380");
-            else
-                phoneNumber = value;
-        }
-    }
-
-    public double Salary
-    {
-        get
-        {
-            if (Program.access_level == "user")
-            {
-                Console.WriteLine("You do not have rights to get Salary");
-                return 0;
-            }
-            else
-                return salary;
-        }
-        set
-        {
-            if (Program.access_level == "user")
-                Console.WriteLine("You do not have rights to set Salary");
-            else if (value < 6700.00)
-                Console.WriteLine("Salary cannot be less than 6700 UAH");
-            else
-                salary = value;
-        }
     }
 
     public override void DisplayMainSkill()
@@ -355,90 +193,9 @@ public class Designer : Employee
 
 public class Tester : Employee
 {
-    private string name;
-    private int age;
-    private string phoneNumber;
-    private double salary;
-
     public Tester(string name, int age, string phoneNumber, double salary) : base(name, age, phoneNumber, salary)
     {
         Console.WriteLine("Tester parametric constructor worked successfully");
-    }
-
-    public string Name
-    {
-        get { return name; }
-        set
-        {
-            if (Program.access_level == "user")
-                Console.WriteLine("You do not have rights to set Name");
-            else if (value == null)
-                Console.WriteLine("Name cannot be empty");
-            else
-                name = value;
-        }
-    }
-
-    public int Age
-    {
-        get
-        {
-            if (Program.access_level == "user")
-            {
-                Console.WriteLine("You do not have rights to get Age");
-                return 0;
-            }
-            else
-                return age;
-        }
-        set
-        {
-            if (Program.access_level == "user")
-                Console.WriteLine("You do not have rights to set Age");
-            else if (value < 16 || value > 99)
-                Console.WriteLine("Age must be in between 16 and 99");
-            else
-                age = value;
-        }
-    }
-
-    public string PhoneNumber
-    {
-        get { return phoneNumber; }
-        set
-        {
-            if (Program.access_level == "user")
-                Console.WriteLine("You do not have rights to set Phone Number");
-            else if (value == null)
-                Console.WriteLine("Phone Number cannot be empty");
-            else if (!value.Contains("+380"))
-                Console.WriteLine("Phone Number must start with +380");
-            else
-                phoneNumber = value;
-        }
-    }
-
-    public double Salary
-    {
-        get
-        {
-            if (Program.access_level == "user")
-            {
-                Console.WriteLine("You do not have rights to get Salary");
-                return 0;
-            }
-            else
-                return salary;
-        }
-        set
-        {
-            if (Program.access_level == "user")
-                Console.WriteLine("You do not have rights to set Salary");
-            else if (value < 6700.00)
-                Console.WriteLine("Salary cannot be less than 6700 UAH");
-            else
-                salary = value;
-        }
     }
 
     public override void DisplayMainSkill()
