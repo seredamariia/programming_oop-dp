@@ -5,10 +5,10 @@ public class Employee : IDisposable
     // Для перевірки, чи викликався вже метод Dispose().
     private bool disposed = false;
 
-    private string name;
-    private int age;
-    private string phoneNumber;
-    private double salary;
+    protected string name;
+    protected int age;
+    protected string phoneNumber;
+    protected double salary;
 
     public Employee()
     {
@@ -125,6 +125,11 @@ public class Employee : IDisposable
             Console.WriteLine("You do not have rights to see Full Info");
     }
 
+    protected double CalculateYearlyBonus()
+    {
+        return Salary * 0.05;
+    }
+
     public void Dispose()
     {
         // Виклик допоміжного методу. "true" - якщо очищення було викликане користувачем об'єкта. 
@@ -170,6 +175,13 @@ public class Developer : Employee
         Console.WriteLine("Developer's main skill is writting code");
     }
 
+    public double CalculateDeveloperBonus()
+    {
+        double yearlyBonus = CalculateYearlyBonus();
+        double developerSpecificBonus = Salary * 0.1;
+        return yearlyBonus + developerSpecificBonus;
+    }
+
     ~Developer()
     {
         Console.WriteLine("Developer destroyed");
@@ -186,6 +198,13 @@ public class Designer : Employee
     public override void DisplayMainSkill()
     {
         Console.WriteLine("Designer's main skill is creating UX/UI design");
+    }
+
+    public double CalculateDesignerBonus()
+    {
+        double yearlyBonus = CalculateYearlyBonus();
+        double developerSpecificBonus = Salary * 0.05;
+        return yearlyBonus + developerSpecificBonus;
     }
 
     ~Designer()
@@ -205,6 +224,13 @@ public class Tester : Employee
     {
         Console.WriteLine("Tester's main skill is testing software");
     }
+    public double CalculateTesterBonus()
+    {
+        double yearlyBonus = CalculateYearlyBonus();
+        double developerSpecificBonus = Salary * 0.025;
+        return yearlyBonus + developerSpecificBonus;
+    }
+
 
     ~Tester()
     {
