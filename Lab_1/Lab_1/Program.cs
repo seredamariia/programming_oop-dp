@@ -264,6 +264,28 @@ public class Authorization
     }
 }
 
+public class CurrentTasks
+{
+    private decimal number;
+
+    public CurrentTasks(decimal count)
+    {
+        Number = number;
+    }
+
+    decimal Number
+    {
+        get { return number; }
+        set
+        {
+            if (Program.access_level == "user")
+                Console.WriteLine("You do not have rights to set Number of Current Tasks");
+            else if (value >= 0)
+                number = value;
+        }
+    }
+}
+
 class Program
 {
     public static string access_level;
@@ -286,24 +308,28 @@ class Program
         }
         access_level = authorization.GetAccessLevel();
 
+        Console.WriteLine();
+
         Employee employee = new Employee();
-
         Console.WriteLine("Memory before collect: " + GC.GetTotalMemory(false));
-
-        // Виводимо покоління об'єкта.
         Console.WriteLine($"Generation: {GC.GetGeneration(employee)}");
-
-        // Викликаємо примусове збирання сміття GC.
         GC.Collect();
-
-        // Викликаємо метод WaitForPendingFinalizers().
-        GC.WaitForPendingFinalizers();
-
         Console.WriteLine("Memory after collect: " + GC.GetTotalMemory(false));
-
-        // Виводимо покоління об'єкта.
         Console.WriteLine($"Generation: {GC.GetGeneration(employee)}");
-
         employee.Dispose();
+
+        Console.WriteLine();
+
+        CurrentTasks currentTasks;
+        for (int i = 0; i < 1000; i++)
+        {
+            currentTasks = new CurrentTasks(1000);
+        }
+        Console.WriteLine("Memory used before collection: {0:N0}",
+        GC.GetTotalMemory(false));
+        // Collect all generations of memory.
+        GC.Collect();
+        Console.WriteLine("Memory used after full collection: {0:N0}",
+        GC.GetTotalMemory(true));
     }
 }
