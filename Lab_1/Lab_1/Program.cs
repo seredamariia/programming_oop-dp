@@ -129,8 +129,11 @@ public class Employee : IDisposable
     {
         // Виклик допоміжного методу. "true" - якщо очищення було викликане користувачем об'єкта. 
         CleanUp(true);
+
         // Подавлення фіналізації.
         GC.SuppressFinalize(this);
+
+        GC.ReRegisterForFinalize(this);
     }
 
     protected virtual void CleanUp(bool disposing)
@@ -282,5 +285,25 @@ class Program
             authorization = Authorization.GetInstance(login, password);
         }
         access_level = authorization.GetAccessLevel();
+
+        Employee employee = new Employee();
+
+        Console.WriteLine("Memory before collect: " + GC.GetTotalMemory(false));
+
+        // Виводимо покоління об'єкта.
+        Console.WriteLine($"Generation: {GC.GetGeneration(employee)}");
+
+        // Викликаємо примусове збирання сміття GC.
+        GC.Collect();
+
+        // Викликаємо метод WaitForPendingFinalizers().
+        GC.WaitForPendingFinalizers();
+
+        Console.WriteLine("Memory after collect: " + GC.GetTotalMemory(false));
+
+        // Виводимо покоління об'єкта.
+        Console.WriteLine($"Generation: {GC.GetGeneration(employee)}");
+
+        employee.Dispose();
     }
 }
