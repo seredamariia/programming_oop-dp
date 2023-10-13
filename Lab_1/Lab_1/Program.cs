@@ -247,6 +247,11 @@ public class Developer : Employee
     {
         Console.WriteLine("Developer's main skill is writting code");
     }
+
+    ~Developer()
+    {
+        Console.WriteLine("Developer destroyed");
+    }
 }
 
 public class Designer : Employee
@@ -341,6 +346,11 @@ public class Designer : Employee
     {
         Console.WriteLine("Designer's main skill is creating UX/UI design");
     }
+
+    ~Designer()
+    {
+        Console.WriteLine("Designer destroyed");
+    }
 }
 
 public class Tester : Employee
@@ -434,6 +444,11 @@ public class Tester : Employee
     public override void DisplayMainSkill()
     {
         Console.WriteLine("Tester's main skill is testing software");
+    }
+
+    ~Tester()
+    {
+        Console.WriteLine("Tester destroyed");
     }
 }
 
