@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Diagnostics.Metrics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
-interface IDevelopable {
+interface IDevelopable
+{
     public abstract void AssignTask();
     public abstract void Deploy();
     public abstract void Maintain();
 }
 
-interface ITestable {
+interface ITestable
+{
     public abstract void AssignTask();
 }
 
-public delegate void Action(Developer developer);
+public delegate void TestingHandler(Developer developer);
 
 public abstract class Employee
 {
@@ -146,7 +149,9 @@ public static class EmployeeExtension
 public class Developer : Employee, IDevelopable, ITestable
 {
     public Boolean isUnitTestingFinished { get; private set; } = false;
-    public event Action Notify;
+    //public event TestingHandler TestingEvent;
+    //public event Action<Developer> TestingEvent;
+    public event Func<Developer, object> TestingEvent;
     public Developer(string name, int age, string phoneNumber, double salary) : base(name, age, phoneNumber, salary) { }
 
     public override void DisplayMainSkill()
@@ -179,7 +184,7 @@ public class Developer : Employee, IDevelopable, ITestable
         isUnitTestingFinished = true;
         Console.WriteLine("Unit testing finished" + "\n");
 
-        Notify?.Invoke((Developer)this);
+        TestingEvent?.Invoke((Developer)this);
     }
 
     public double CalculateDeveloperBonus()
@@ -188,7 +193,7 @@ public class Developer : Employee, IDevelopable, ITestable
         double developerSpecificBonus = Salary * 0.1;
         return yearlyBonus + developerSpecificBonus;
     }
-    
+
 }
 
 public class Designer : Employee
@@ -297,6 +302,45 @@ public class Authorization
     }
 }
 
+public delegate void ExceptionHandler(object sender, CustomExceptionEventArgs e);
+
+public class MyCustomException : Exception
+{
+    public MyCustomException(string message) : base(message)
+    {
+    }
+}
+public class CustomExceptionEventArgs : EventArgs
+{
+    public MyCustomException Exception { get; }
+
+    public CustomExceptionEventArgs(MyCustomException exception)
+    {
+        Exception = exception;
+    }
+}
+public class Error
+{
+    public event ExceptionHandler ProgrammError;
+
+    public void SimulateError()
+    {
+        try
+        {
+            throw new MyCustomException("Something went wrong!");
+        }
+        catch (MyCustomException ex)
+        {
+            ProgrammError?.Invoke(this, new CustomExceptionEventArgs(ex));
+        }
+    }
+    public void HandleCustomException(object sender, CustomExceptionEventArgs e)
+    {
+        Console.WriteLine($"\nCustom Exception Handler: {e.Exception.Message}");
+    }
+}
+
+
 class Program
 {
     public static string access_level;
@@ -320,16 +364,67 @@ class Program
         access_level = authorization.GetAccessLevel();
 
         Developer developer = new Developer("Matvii", 18, "+380509695043", 37000);
-        
+
         Tester tester = new Tester("Mariia", 18, "+380996625909", 72000);
+
+        Error error = new Error();
 
         Console.WriteLine();
 
-        developer.Notify += new Action(tester.startTesting);
+        ////Дефолтна реалізація
+        //developer.TestingEvent += new TestingHandler(tester.startTesting);
+
+        ////Реалізація через анонімний метод
+        //developer.TestingEvent += delegate (Developer developer)
+        //{
+        //    if (developer.isUnitTestingFinished == true)
+        //    {
+        //        Console.WriteLine("Development phase finished. Testing phase now in progress...");
+        //        ((ITestable)(tester)).AssignTask();
+        //    }
+        //};
+
+        ////Реалізація через лямбда вираз
+        //developer.TestingEvent += (Developer developer) =>
+        //{
+        //    if (developer.isUnitTestingFinished == true)
+        //    {
+        //        Console.WriteLine("Development phase finished. Testing phase now in progress...");
+        //        ((ITestable)(tester)).AssignTask();
+        //    }
+        //};
+
+        ////Реалізація через Action
+        //Action<Developer> TestingEvent = (developer) =>
+        //{
+        //    if (developer.isUnitTestingFinished == true)
+        //    {
+        //        Console.WriteLine("Development phase finished. Testing phase now in progress...");
+        //        ((ITestable)(tester)).AssignTask();
+        //    }
+        //};
+        //developer.TestingEvent += TestingEvent;
+
+        //Реалізація через Func
+        Func<Developer, object> TestingEvent = (developer) =>
+        {
+            if (developer.isUnitTestingFinished == true)
+            {
+                Console.WriteLine("Development phase finished. Testing phase now in progress...");
+                ((ITestable)(tester)).AssignTask();
+            }
+            return "The test was done by " + developer.Name;
+        };
+        developer.TestingEvent += TestingEvent;
+
+        error.ProgrammError += new ExceptionHandler(error.HandleCustomException);
+
 
         ((IDevelopable)developer).AssignTask();
         Console.WriteLine();
 
         ((ITestable)developer).AssignTask();
+
+        error.SimulateError();
     }
 }
