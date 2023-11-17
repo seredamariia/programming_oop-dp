@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Metrics;
+using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
@@ -302,57 +303,35 @@ public class Authorization
     }
 }
 
-public delegate void ExceptionHandler(object sender, CustomExceptionEventArgs e);
+public delegate void ExceptionHandler(object sender, InvalidAnswerEventArgs e);
 
-public class MyCustomException : Exception
+public class InvalidAnswerException : Exception
 {
-    public MyCustomException(string message) : base(message)
+    public InvalidAnswerException(string message) : base(message) { }
+}
+
+
+public class InvalidAnswerEventArgs : EventArgs
+{
+    public string InvalidAnswer { get; }
+
+    public InvalidAnswerEventArgs(string invalidAnswer)
     {
+        InvalidAnswer = invalidAnswer;
     }
 }
-public class CustomExceptionEventArgs : EventArgs
-{
-    public MyCustomException Exception { get; }
 
-    public CustomExceptionEventArgs(MyCustomException exception)
-    {
-        Exception = exception;
-    }
-}
 public class Error
 {
-    public event ExceptionHandler ProgrammError;
+    public event ExceptionHandler InvalidAnswerProvided;
 
-    public void SimulateError()
+    public void HandleUserAnswer(string answer, ref Authorization authorization)
     {
-        try
-        {
-            throw new MyCustomException("Something went wrong!");
-        }
-        catch (MyCustomException ex)
-        {
-            ProgrammError?.Invoke(this, new CustomExceptionEventArgs(ex));
-        }
-    }
-    public void HandleCustomException(object sender, CustomExceptionEventArgs e)
-    {
-        Console.WriteLine($"\nCustom Exception Handler: {e.Exception.Message}");
-    }
-}
 
-
-class Program
-{
-    public static string access_level;
-
-    static void Main(string[] args)
-    {
-        Authorization authorization = null;
-        Console.WriteLine("Your current access level is [user] and you have limited rights. Do you want to change access level to [admin] and have unlimited rights?");
-        Console.WriteLine("Enter [YES] or [NO]");
-        string answer = Console.ReadLine();
         if (answer.ToUpper() == "NO")
+        {
             authorization = Authorization.GetInstance();
+        }
         else if (answer.ToUpper() == "YES")
         {
             Console.WriteLine("Enter login:");
@@ -361,13 +340,51 @@ class Program
             string password = Console.ReadLine();
             authorization = Authorization.GetInstance(login, password);
         }
+        else
+        {
+            InvalidAnswerProvided?.Invoke(null, new InvalidAnswerEventArgs(answer));
+        }
+    }
+
+    public void InvalidAnswerHandler(object sender, InvalidAnswerEventArgs e)
+    {
+        throw new InvalidAnswerException($"Invalid answer: {e.InvalidAnswer}. Please enter [YES] or [NO].");
+    }
+}
+
+class Program
+{
+    public static string access_level;
+
+    static void Main(string[] args)
+    {
+        Error error = new Error();
+        error.InvalidAnswerProvided += new ExceptionHandler(error.InvalidAnswerHandler);
+
+        Authorization authorization = null;
+        Console.WriteLine("Your current access level is [user] and you have limited rights. Do you want to change access level to [admin] and have unlimited rights?");
+        Console.WriteLine("Enter [YES] or [NO]");
+
+        do
+        {
+            string answer = Console.ReadLine();
+
+            try
+            {
+                error.HandleUserAnswer(answer, ref authorization);
+            }
+            catch (InvalidAnswerException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        } while (authorization == null);
+
         access_level = authorization.GetAccessLevel();
 
         Developer developer = new Developer("Matvii", 18, "+380509695043", 37000);
 
         Tester tester = new Tester("Mariia", 18, "+380996625909", 72000);
 
-        Error error = new Error();
 
         Console.WriteLine();
 
@@ -417,14 +434,9 @@ class Program
         };
         developer.TestingEvent += TestingEvent;
 
-        error.ProgrammError += new ExceptionHandler(error.HandleCustomException);
-
-
         ((IDevelopable)developer).AssignTask();
         Console.WriteLine();
 
         ((ITestable)developer).AssignTask();
-
-        error.SimulateError();
     }
 }
